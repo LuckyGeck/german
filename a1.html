@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interaktiver A1-Grammatik-Leitfaden</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A responsive two-column layout is used. A left sidebar provides thematic navigation (Nouns/Verbs/etc.), and a main content area displays details for the selected topic. This master-detail structure organizes the 20 topics into a logical hierarchy, preventing information overload and allowing users to focus on one concept at a time, which is better for learning than a static table. -->
+    <!-- Visualization & Content Choices: Report Info (20 Grammar Topics) -> Goal (Inform/Organize) -> Presentation (Interactive list + content cards) -> Interaction (Click to display details) -> Justification (Provides focused learning path and clear organization). All content is rendered as styled HTML text. No charts are needed or used. CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+        }
+
+        .sidebar-item.active {
+            background-color: #e0f2fe;
+            color: #0c4a6e;
+            font-weight: 600;
+        }
+
+        .content-enter {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+    <div id="app" class="flex flex-col md:flex-row min-h-screen">
+        <aside class="w-full md:w-80 bg-white border-r border-slate-200 p-4 md:p-6 md:overflow-y-auto">
+            <h1 class="text-xl font-bold text-slate-900 mb-6">A1 Grammatik</h1>
+            <nav id="sidebar-nav" class="space-y-6"></nav>
+        </aside>
+
+        <main class="flex-1 p-4 md:p-10">
+            <div class="max-w-4xl mx-auto">
+                <div id="main-content" class="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const grammarData = [
+                {
+                    category: "Grundlagen: Nomen & Artikel",
+                    topics: [
+                        {
+                            id: 1,
+                            title: "Bestimmter/Unbestimmter Artikel",
+                            description:
+                                "Definite (<i>der/die/das</i>) und indefinite (<i>ein/eine</i>) Artikel. Sie ändern sich je nach Geschlecht (m/f/n) des Nomens und dem Fall (hier meist Nominativ).",
+                            examples: [
+                                "<i>Der</i> Mann, <i>die</i> Frau, <i>das</i> Kind.",
+                                "<i>Ein</i> Hund, <i>eine</i> Katze.",
+                            ],
+                        },
+                        {
+                            id: 2,
+                            title: "Negativer Artikel „kein/keine“",
+                            description:
+                                'Wird verwendet, um ein Nomen zu verneinen ("nicht ein/kein"). Wird ähnlich wie der unbestimmte Artikel <i>ein</i> dekliniert.',
+                            examples: [
+                                "Ich habe <i>keine</i> Zeit.",
+                                "Das ist <i>kein</i> Problem.",
+                            ],
+                        },
+                        {
+                            id: 3,
+                            title: "Nomen: Plural",
+                            description:
+                                "Deutsche Nomen bilden den Plural auf verschiedene Weisen (-n, -e, -er, +¨, usw.). Lernen Sie immer den Artikel <i>die</i> mit der Pluralform.",
+                            examples: [
+                                "Der Tisch &rarr; Die Tische.",
+                                "Das Buch &rarr; Die Bücher.",
+                            ],
+                        },
+                    ],
+                },
+                {
+                    category: "Fälle (Kasus)",
+                    topics: [
+                        {
+                            id: 13,
+                            title: "Akkusativobjekt",
+                            description:
+                                "Das direkte Objekt (der Empfänger der Handlung: Wen? Was?). Nur die maskulinen bestimmten/unbestimmten Artikel ändern sich: <i>der</i> &rarr; <i>den</i>, <i>ein</i> &rarr; <i>einen</i>.",
+                            examples: [
+                                "Ich sehe <i>den</i> Mann.",
+                                "Sie kauft <i>einen</i> Tisch.",
+                            ],
+                        },
+                        {
+                            id: 14,
+                            title: "Dativobjekt (Grundformen)",
+                            description:
+                                "Das indirekte Objekt (Wem?). Wird nach bestimmten Verben (z.B. <i>helfen, danken, gefallen, gehören, schmecken</i>) oder Präpositionen verwendet. Grundlegende Pronomen: <i>mir, dir, ihm, ihr, uns, euch, ihnen/Ihnen</i>.",
+                            examples: [
+                                "Er hilft <i>mir</i>.",
+                                "Das Essen schmeckt <i>uns</i>.",
+                            ],
+                        },
+                        {
+                            id: 18,
+                            title: "Possessivartikel im Akkusativ",
+                            description:
+                                "Possessivartikel, die im Akkusativ verwendet werden. Auch hier erhält nur die maskuline Form die Endung -en. Z.B.: <i>meinen, deinen</i>, usw.",
+                            examples: [
+                                "Ich suche <i>meinen</i> (m) Schlüssel.",
+                                "Ich sehe <i>deine</i> (f) Katze.",
+                            ],
+                        },
+                    ],
+                },
+                {
+                    category: "Verben & Satzbau",
+                    topics: [
+                        {
+                            id: 6,
+                            title: "Verbkonjugation (regelmäßig)",
+                            description:
+                                "Regelmäßige Verben folgen einem Standardmuster von Endungen im Präsens: -e, -st, -t, -en, -t, -en.",
+                            examples: [
+                                "Ich <i>mache</i>, du <i>machst</i>, er <i>macht</i>, wir <i>machen</i>, ihr <i>macht</i>, sie <i>machen</i>.",
+                            ],
+                        },
+                        {
+                            id: 7,
+                            title: "Unregelmäßige Verben (Präsens)",
+                            description:
+                                "Starke Verben mit Vokalwechsel in der zweiten und dritten Person Singular (<i>du</i> und <i>er/sie/es</i>).",
+                            examples: [
+                                "<i>e</i> &rarr; <i>i</i>: sprechen &rarr; du <i>sprichst</i>",
+                                "<i>e</i> &rarr; <i>ie</i>: sehen &rarr; du <i>siehst</i>.",
+                            ],
+                        },
+                        {
+                            id: 9,
+                            title: "Satzstellung (Aussagesatz)",
+                            description:
+                                "In einem normalen Aussagesatz muss das <b>konjugierte Verb</b> immer an zweiter Stelle stehen.",
+                            examples: [
+                                "Ich <i>gehe</i> heute ins Kino.",
+                                "Heute <i>gehe</i> ich ins Kino.",
+                            ],
+                        },
+                        {
+                            id: 11,
+                            title: "Modalverben im Präsens",
+                            description:
+                                "Verben wie <i>können, müssen, wollen</i>, die eine Modalität ausdrücken. Das Modalverb wird an Position 2 konjugiert, und das Hauptverb (Infinitiv) steht am Ende. (können, müssen, wollen, dürfen, mögen, sollen)",
+                            examples: [
+                                "Ich <i>kann</i> Deutsch sprechen.",
+                                "Du <i>musst</i> jetzt gehen.",
+                            ],
+                        },
+                        {
+                            id: 12,
+                            title: "Trennbare Verben",
+                            description:
+                                "Verben mit einem trennbaren Präfix (<i>an-, mit-, auf-</i>). Das Präfix wird ans Ende des Satzes verschoben, wenn das Verb im Präsens konjugiert wird. Bsp: <i>aufräumen, mitmachen, anrufen</i>",
+                            examples: [
+                                "<i>an</i>rufen &rarr; Ich <i>rufe</i> dich <i>an</i>.",
+                            ],
+                        },
+                    ],
+                },
+                {
+                    category: "Pronomen & Personen",
+                    topics: [
+                        {
+                            id: 4,
+                            title: "Personalpronomen",
+                            description:
+                                "Subjektpronomen (<i>ich, du, er, sie, es, wir, ihr, sie/Sie</i>).",
+                            examples: [
+                                "<i>Ich</i> lerne.",
+                                "<i>Er</i> trinkt.",
+                                "<i>Wir</i> sind hier.",
+                            ],
+                        },
+                        {
+                            id: 5,
+                            title: "Possessivpronomen (Nom.)",
+                            description:
+                                "Possessivartikel (<i>mein, dein, sein, ihr</i>, usw.) im Nominativ. Sie richten sich nach dem Geschlecht des <i>Nomens</i>, dem sie vorangehen.",
+                            examples: [
+                                "<i>Mein</i> Auto ist rot.",
+                                "<i>Deine</i> Schwester ist nett.",
+                            ],
+                        },
+                    ],
+                },
+                {
+                    category: "Präpositionen",
+                    topics: [
+                        {
+                            id: 15,
+                            title: "Präpositionen mit Akkusativ",
+                            description:
+                                "Präpositionen, die <b>immer</b> den Akkusativ verlangen: <i>für, ohne, gegen, um, durch</i>.",
+                            examples: ["<i>Für</i> <i>ihn</i> (Akk.) ist das gut."],
+                        },
+                        {
+                            id: 16,
+                            title: "Präpositionen mit Dativ",
+                            description:
+                                "Präpositionen, die <b>immer</b> den Dativ verlangen: <i>mit, nach, bei, seit, von, zu, aus</i>.",
+                            examples: [
+                                "Ich fahre <i>mit</i> <i>dem</i> Zug (Dat.).",
+                                "Er kommt <i>aus</i> <i>Deutschland</i> (Dat.).",
+                            ],
+                        },
+                        {
+                            id: 17,
+                            title: "Lokalpräpositionen",
+                            description:
+                                'Ortspräpositionen (<i>in, auf, unter, neben,</i> usw.). Auf A1-Niveau werden sie oft mit dem Dativ für einen festen Ort verwendet ("Wo?" &rarr; Dativ).',
+                            examples: [
+                                "Das Buch liegt <i>auf</i> <i>dem</i> Tisch (Dat.).",
+                            ],
+                        },
+                    ],
+                },
+                {
+                    category: "Fragen & Befehle",
+                    topics: [
+                        {
+                            id: 8,
+                            title: "Fragesätze (W-/Ja/Nein)",
+                            description:
+                                "<b>W-Fragen:</b> Beginnen mit dem Fragewort (<i>Wer, Was, Wo</i>), gefolgt vom konjugierten Verb. <b>Ja/Nein-Fragen:</b> Beginnen mit dem konjugierten Verb.",
+                            examples: ["<i>Was</i> machst du?", "<i>Kommst</i> du mit?"],
+                        },
+                        {
+                            id: 10,
+                            title: "Imperativ",
+                            description:
+                                "Befehle oder Aufforderungen in der <i>du</i>-, <i>ihr</i>- und formellen <i>Sie</i>-Form.",
+                            examples: [
+                                "<i>Komm</i> (du)!",
+                                "<i>Kommt</i> (ihr)!",
+                                "<i>Kommen</i> Sie* (Sie)!",
+                            ],
+                        },
+                    ],
+                },
+                {
+                    category: "Weitere Konzepte",
+                    topics: [
+                        {
+                            id: 19,
+                            title: "Zeitangaben",
+                            description:
+                                "Häufige Präpositionen und Strukturen zur Angabe der Zeit. <i>Am</i> (Tag/Datum), <i>um</i> (Uhrzeit), <i>von...bis</i> (von...bis), <i>ab</i> (ab/von...an).",
+                            examples: [
+                                "<i>Am</i> Montag treffe ich dich.",
+                                "Der Film beginnt <i>um</i> 20 Uhr.",
+                                "Ich arbeite <i>von</i> 9 <i>bis</i> 5.",
+                                "<i>Ab</i> morgen bin ich im Urlaub.",
+                            ],
+                        },
+                        {
+                            id: 20,
+                            title: "Vergleiche mit „wie“ und „als“",
+                            description:
+                                "Einfache Vergleiche: <i>wie</i> für Gleichheit, <i>als</i> für Ungleichheit. Beide verwenden den Nominativ für das zweite Element.",
+                            examples: [
+                                "Er ist so schnell <i>wie</i> ich.",
+                                "Sie ist älter <i>als</i> du.",
+                            ],
+                        },
+                    ],
+                },
+            ];
+
+            const sidebarNav = document.getElementById("sidebar-nav");
+            const mainContent = document.getElementById("main-content");
+
+            function renderSidebar() {
+                let html = "";
+                grammarData.forEach((category) => {
+                    html += `
+                    <div>
+                        <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">${category.category}</h2>
+                        <div class="space-y-1">
+                `;
+                    category.topics.forEach((topic) => {
+                        html += `<a href="#" class="sidebar-item flex items-center px-4 py-2 text-sm text-slate-700 rounded-md hover:bg-slate-100 transition-colors duration-150" data-id="${topic.id}">${topic.title}</a>`;
+                    });
+                    html += `</div></div>`;
+                });
+                sidebarNav.innerHTML = html;
+            }
+
+            function renderContent(topicId) {
+                let topic;
+                for (const category of grammarData) {
+                    const found = category.topics.find((t) => t.id === topicId);
+                    if (found) {
+                        topic = found;
+                        break;
+                    }
+                }
+
+                if (!topic) {
+                    mainContent.innerHTML =
+                        "<p>Bitte wählen Sie ein Thema aus der Liste.</p>";
+                    return;
+                }
+
+                // HTML content now contains <i> tags directly
+                let examplesHtml = topic.examples
+                    .map(
+                        (ex) =>
+                            `<li class="mt-2"><code class="bg-slate-100 text-slate-800 rounded-md px-2 py-1 text-base">${ex}</code></li>`
+                    )
+                    .join("");
+
+                mainContent.innerHTML = `
+                <div class="content-enter">
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4">${topic.title}</h2>
+                    <!-- Description renders HTML tags like <i> and <b> correctly -->
+                    <p class="text-slate-600 text-base leading-relaxed">${topic.description}</p>
+                    <hr class="my-6 border-slate-200">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2">Beispiele</h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600">${examplesHtml}</ul>
+                </div>
+            `;
+            }
+
+            function updateActiveLink(targetId) {
+                document.querySelectorAll(".sidebar-item").forEach((item) => {
+                    item.classList.remove("active");
+                });
+                const activeItem = document.querySelector(
+                    `.sidebar-item[data-id='${targetId}']`
+                );
+                if (activeItem) {
+                    activeItem.classList.add("active");
+                }
+            }
+
+            sidebarNav.addEventListener("click", (e) => {
+                e.preventDefault();
+                const target = e.target.closest(".sidebar-item");
+                if (target) {
+                    const topicId = parseInt(target.dataset.id, 10);
+                    renderContent(topicId);
+                    updateActiveLink(topicId);
+                }
+            });
+
+            renderSidebar();
+            renderContent(1);
+            updateActiveLink(1);
+        });
+    </script>
+</body>
+
+</html>
